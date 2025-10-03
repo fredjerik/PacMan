@@ -1,15 +1,17 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
-using namespace std;
+#include "pacman.h"
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({200, 200}), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    sf::RenderWindow window(sf::VideoMode({1800, 1000}), "Pac-Man Sprite Test");
+    pacman pacman;
+    sf::Clock clock;
 
     while (window.isOpen())
     {
+        float delta_time = clock.restart().asSeconds(); // Move this HERE
+
+        // Event handling
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -17,8 +19,29 @@ int main()
                 window.close();
         }
 
+        // Real-time input handling (OUTSIDE event loop)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
+            pacman.set_direction(direction::Up);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+            pacman.set_direction(direction::Down);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+            pacman.set_direction(direction::Left);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            pacman.set_direction(direction::Right);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+            window.close();
+        }
+
+        // Update and render (OUTSIDE event loop)
+        pacman.update(delta_time);
+
         window.clear();
-        window.draw(shape);
+        window.draw(pacman.get_sprite());
         window.display();
     }
+    return 0;
 }

@@ -1,23 +1,35 @@
 #ifndef PACMAN_ENTITY_H
 #define PACMAN_ENTITY_H
 
-struct position
-{
-    double x;
-    double y;
+#include <SFML/Graphics.hpp>
+
+struct position {
+    float x = 0;
+    float y = 0;
 };
-class entity
-{
+
+class entity {
 public:
-    entity();
-    ~entity();
+    entity() = default;
+    virtual ~entity() = default;
+    void set_position(const position& pos) {
+        position_ = pos;
+        sprite_.setPosition(pos.x, pos.y);
+    }
 
-    inline void set_position(position& pos){position = pos;}
-    inline position get_position() const {return position;}
-private:
-    position position;
+    position get_position() const { return position_; }
 
+    sf::Sprite& get_sprite() { return sprite_; }
+
+    void set_sprite() {
+        sprite_.setTexture(texture_);
+    }
+
+protected:
+    position position_;
+    sf::Texture texture_;
+    sf::Sprite sprite_;
+    sf::IntRect rectangle_;
 };
 
-
-#endif //PACMAN_ENTITY_H
+#endif

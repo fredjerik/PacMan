@@ -7,15 +7,13 @@ find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 
 add_executable(PacMan
         src/main.cpp
-        src/world.cpp
-        src/entity.cpp
-        src/pacman.cpp
         src/entity.h
+        src/entity.cpp
         src/pacman.h
-        src/world.h
-        src/enemy.cpp
-        src/enemy.h
-        src/wall.cpp
-        src/wall.h
+        src/pacman.cpp
+        src/game.h
+        src/game.cpp
+        src/dynamic_entity.h
+        src/dynamic_entity.cpp
 )
 target_link_libraries(PacMan sfml-graphics sfml-window sfml-system)

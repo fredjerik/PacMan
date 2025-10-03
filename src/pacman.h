@@ -1,13 +1,17 @@
 #ifndef PACMAN_PACMAN_H
 #define PACMAN_PACMAN_H
+#include "dynamic_entity.h"
 
-#include "entity.h"
-
-class pacman: public entity
+class pacman: public dynamic_entity
 {
 public:
-    pacman(): entity("pacman"){
+    pacman(): dynamic_entity()
+    {
+        texture_.loadFromFile("../textures/sprite.png");
+        speed = 200.0f;
+        pacman::set_rectangle(direction::None);
     }
+    void set_rectangle(direction dir) override;
 };
 
 
