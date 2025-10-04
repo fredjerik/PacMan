@@ -11,9 +11,10 @@ add_executable(PacMan
         src/entity.cpp
         src/pacman.h
         src/pacman.cpp
-        src/game.h
-        src/game.cpp
         src/dynamic_entity.h
         src/dynamic_entity.cpp
+        src/game.cpp
+        src/game.h
+
 )
 target_link_libraries(PacMan sfml-graphics sfml-window sfml-system)
