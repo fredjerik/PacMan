@@ -3,18 +3,29 @@ project(PacMan)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
+find_package(SFML 2.6 COMPONENTS graphics window system REQUIRED)
 
-add_executable(PacMan
-        src/main.cpp
-        src/entity.h
-        src/entity.cpp
-        src/pacman.h
-        src/pacman.cpp
-        src/dynamic_entity.h
-        src/dynamic_entity.cpp
-        src/game.cpp
-        src/game.h
-
+file(GLOB_RECURSE LOGIC_SOURCES
+    "src/Logic/*.cpp"
+    "src/Singleton/*.cpp"
 )
-target_link_libraries(PacMan sfml-graphics sfml-window sfml-system)
+
+add_library(pacman_logic STATIC ${LOGIC_SOURCES})
+
+target_include_directories(pacman_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+file(GLOB_RECURSE SFML_SOURCES
+        "src/Representation/*.cpp"
+)
+
+add_library(pacman_sfml STATIC ${SFML_SOURCES})
+
+target_include_directories(pacman_sfml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+target_link_libraries(pacman_sfml PRIVATE pacman_logic sfml-graphics sfml-window sfml-system)
+
+add_executable(PacMan src/main.cpp)
+
+target_include_directories(PacMan PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+target_link_libraries(PacMan PRIVATE pacman_sfml)

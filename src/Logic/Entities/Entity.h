@@ -9,6 +9,12 @@ namespace logic {
     struct Position {
         float x = 0.0f;
         float y = 0.0f;
+
+        bool operator<(const Position& other) const {
+            if (x < other.x) return true;
+            if (x > other.x) return false;
+            return y < other.y;
+        }
     };
 
     struct Size {
@@ -18,12 +24,13 @@ namespace logic {
 
     class Entity: public Subject {
     public:
-        explicit Entity(Position startPos) : pos(startPos) {}
+        explicit Entity(Position startPos) : pos(startPos){}
         virtual ~Entity() = default;
 
         virtual void update(float deltaTime) = 0;
 
         Position getPosition() const { return pos; }
+        // Size getSize() const { return size; }
 
     protected:
         Position pos;

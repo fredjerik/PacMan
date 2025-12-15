@@ -1,5 +1,6 @@
 #include "Map.h"
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 
 namespace logic {
@@ -27,46 +28,68 @@ namespace logic {
 
         m_gridHeight = m_tiles.size();
         m_gridWidth = m_tiles.empty() ? 0 : m_tiles[0].size();
+
+        // --- FIX ---
+        // Ensure all lines have the same width by padding shorter lines with walls.
+        // This prevents out-of-bounds access on ragged map files.
+        for (auto& row : m_tiles) {
+            row.resize(m_gridWidth, ' ');
+        }
     }
 
     void Map::parseTiles() {
-        m_wallData.clear();
+        m_tileData.clear();
         m_entityData.clear();
-        Size logicalTileSize = getLogicalTileSize();
 
         for (int y = 0; y < m_gridHeight; ++y) {
             for (int x = 0; x < m_gridWidth; ++x) {
-                char tile = m_tiles[y][x];
-                Position logicalPos = gridToLogical(x, y);
+                char tileChar = m_tiles[y][x];
+                Position topLeftPos = gridToTopLeft(x, y);
+                TileType tileType = TileType::EMPTY;
+                EntityType entityType;
+                bool isEntity = false;
 
-                switch (tile) {
+                switch (tileChar) {
                     case '#':
-                        // For a wall, create a bounding box and add it to the wall data
-                        m_wallData.push_back({logicalPos.x - logicalTileSize.width / 2.0f,
-                                             logicalPos.y - logicalTileSize.height / 2.0f,
-                                             logicalTileSize.width,
-                                             logicalTileSize.height});
+                        tileType = TileType::WALL;
                         break;
                     case 'p':
-                        m_entityData.push_back({EntityType::PACMAN, logicalPos});
+                        tileType = TileType::PACMAN;
+                        entityType = EntityType::PACMAN;
+                        isEntity = true;
                         break;
                     case '.':
-                        m_entityData.push_back({EntityType::COIN, logicalPos});
+                        tileType = TileType::COIN;
+                        entityType = EntityType::COIN;
+                        isEntity = true;
                         break;
                     case 'o':
-                        m_entityData.push_back({EntityType::FRUIT, logicalPos});
+                        tileType = TileType::FRUIT;
+                        entityType = EntityType::FRUIT;
+                        isEntity = true;
                         break;
                     case 'g':
-                        m_entityData.push_back({EntityType::GHOST, logicalPos});
+                        tileType = TileType::GHOST;
+                        entityType = EntityType::GHOST;
+                        isEntity = true;
                         break;
+                    default:
+                        tileType = TileType::EMPTY;
+                        break;
+                }
+
+                m_tileData[topLeftPos] = tileType;
+
+                if (isEntity) {
+                    m_entityData.push_back({entityType, topLeftPos});
                 }
             }
         }
     }
 
-    Position Map::gridToLogical(int x, int y) const {
-        float logicalX = ((static_cast<float>(x) + 0.5f) / static_cast<float>(m_gridWidth)) * 2.0f - 1.0f;
-        float logicalY = ((static_cast<float>(y) + 0.5f) / static_cast<float>(m_gridHeight)) * 2.0f - 1.0f;
+    Position Map::gridToTopLeft(int x, int y) const {
+        float logicalX = (static_cast<float>(x) / static_cast<float>(m_gridWidth)) * 2.0f - 1.0f;
+        float logicalY = (static_cast<float>(y) / static_cast<float>(m_gridHeight)) * 2.0f - 1.0f;
         return {logicalX, logicalY};
     }
 
@@ -77,8 +100,8 @@ namespace logic {
         return {0.0f, 0.0f};
     }
 
-    const std::vector<BoundingBox>& Map::getWallData() const {
-        return m_wallData;
+    const std::map<Position, TileType>& Map::getTileData() const {
+        return m_tileData;
     }
 
     const std::vector<EntityCreationData>& Map::getEntityData() const {

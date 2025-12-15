@@ -10,7 +10,8 @@ namespace singleton
 
     sf::RenderWindow& RenderWindow::getInstance() {
         if (windowInstance == nullptr) {
-            windowInstance = new sf::RenderWindow({1800, 1000}, "Pac-Man");
+            windowInstance = new sf::RenderWindow({800, 1080}, "Pac-Man", sf::Style::Fullscreen);  //running
+            // windowInstance = new sf::RenderWindow({800, 1080}, "Pac-Man"); //for debugging
             windowInstance->setFramerateLimit(60);
         }
         return *windowInstance;
