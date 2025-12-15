@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <map>
 #include "Entities/Dynamic_Entities/DynamicEntity.h"
 #include "Entities/Entity.h"
 #include "Patterns/AbstractFactory.h"
@@ -19,17 +20,23 @@ namespace logic {
         void update(float deltaTime);
         void setPacManDirection(Direction dir);
         std::vector<Observer*> getObservers();
+        const std::map<Position, bool>& getWalls() const {return m_walls;};
+        const int get_gridWidth() const {return gridWidth;}
+        const int get_gridHeight() const {return gridHeight;}
+        const Size getLogicalTileSize() const {return m_logicalTileSize;}
 
     private:
-        bool isMoveValid(const BoundingBox& futureBox) const;
-        BoundingBox calculateFutureBox(const DynamicEntity& entity, float deltaTime, Direction dir) const;    //TODO:: change so it works with 2 corners.
+        bool isMoveValid(const Position& futurePos, Direction dir) const;
+        bool isWallAt(const Position& point) const;
 
         factory::AbstractFactory* m_factory;
         std::shared_ptr<PacmanEntity> m_pacman;
         // TODO: Add containers for other entities
 
-        std::vector<BoundingBox> m_walls;
+        std::map<Position, bool> m_walls;
         Size m_logicalTileSize;
+        int gridWidth;
+        int gridHeight;
     };
 
 } // namespace logic
