@@ -100,7 +100,11 @@ namespace logic {
     }
 
     void DynamicEntity::snapToGrid(float tileWidth, float tileHeight) {
+        // Tile size in world units
+        // tileWidth = 2.0f / gridWidth, tileHeight = 2.0f / gridHeight
 
+        // Snap X coordinate to nearest tile boundary
+        // We want: pos.x = multiple of tileWidth - 1.0f
         float xInGrid = (pos.x + 1.0f) / tileWidth; // Convert to grid units
         int tileX = static_cast<int>(round(xInGrid));      // Round to nearest tile
         pos.x = tileX * tileWidth - 1.0f;           // Convert back to world
@@ -112,4 +116,5 @@ namespace logic {
 
         notify(); // Notify observers about position change
     }
+
 } // namespace logic

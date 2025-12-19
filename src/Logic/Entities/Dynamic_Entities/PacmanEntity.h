@@ -7,7 +7,7 @@ namespace logic {
 
     class PacmanEntity : public DynamicEntity {
     public:
-        explicit PacmanEntity(Position startPos, Size size, float velX_unit, float velY_unit);
+        explicit PacmanEntity(Position startPos, float velX_unit, float velY_unit);
 
 
         int getLives() const { return lives; }
