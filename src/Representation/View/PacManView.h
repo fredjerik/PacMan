@@ -12,7 +12,8 @@ namespace view
     class PacManView : public EntityView
     {
     public:
-        explicit PacManView(std::shared_ptr<logic::PacmanEntity> model);
+        explicit PacManView(std::weak_ptr<logic::PacmanEntity> model);
+        void onGameEvent(logic::GameEvent event, int data) override;
     };
 } // view
 

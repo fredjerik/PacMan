@@ -11,21 +11,17 @@ namespace logic {
     enum class TileType {
         WALL,
         EMPTY,
-        PACMAN,
-        GHOST,
-        COIN,
-        FRUIT
+        GHOSTGATE
     };
 
-    // Enum to represent the different types of entities
     enum class EntityType {
         PACMAN,
         GHOST,
         COIN,
+        POWERUP,
         FRUIT
     };
 
-    // Struct to hold data for dynamic entity creation
     struct EntityCreationData {
         EntityType type;
         Position position;
@@ -37,7 +33,6 @@ namespace logic {
     public:
         explicit Map(const std::string& filePath);
 
-        // Getters for the processed data
         const std::map<Position, TileType>& getTileData() const;
         const std::vector<EntityCreationData>& getEntityData() const;
         int getGridWidth() const;

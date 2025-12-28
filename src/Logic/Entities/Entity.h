@@ -5,7 +5,6 @@
 
 namespace logic {
 
-    // Using simple structs to avoid SFML dependencies
     struct Position {
         float x = 0.0f;
         float y = 0.0f;
@@ -24,16 +23,17 @@ namespace logic {
 
     class Entity: public Subject {
     public:
-        explicit Entity(Position startPos) : pos(startPos){}
-        virtual ~Entity() = default;
+        explicit Entity(Position startPos, Size size) : pos_(startPos), size_(size) {}
+        ~Entity() override = default;
 
         virtual void update(float deltaTime) = 0;
 
-        Position getPosition() const { return pos; }
-        // Size getSize() const { return size; }
+        Position getPosition() const { return pos_; }
+        Size getSize() const { return size_; }
 
     protected:
-        Position pos;
+        Position pos_;
+        Size size_;
     };
 
 } // namespace logic

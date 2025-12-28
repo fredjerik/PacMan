@@ -8,8 +8,8 @@ namespace logic {
 
     int DynamicEntity::frameCounter = 0;
 
-    DynamicEntity::DynamicEntity(Position startPos, float velX_unit, float velY_unit)
-        : Entity(startPos),  currentDirection(Direction::None), speed(1.0f),
+    DynamicEntity::DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit)
+        : Entity(startPos, size),  currentDirection(Direction::None), speed(1.0f),
           velX(0.0f), velY(0.0f), m_velX_unit(velX_unit), m_velY_unit(velY_unit){}
 
     void DynamicEntity::setDirection(Direction dir) {
@@ -41,9 +41,9 @@ namespace logic {
         nextDirection = dir;
     }
 
-    void DynamicEntity::setPosition(Position& pos_)
+    void DynamicEntity::setPosition(Position& pos)
     {
-        pos = pos_;
+        pos_ = pos;
     }
 
     Direction DynamicEntity::getDirection() const {
@@ -60,14 +60,13 @@ namespace logic {
     }
 
     void DynamicEntity::update(float deltaTime) {
-        pos.x += velX * speed * deltaTime;
-        pos.y += velY * speed * deltaTime;
+        pos_.x += velX * speed * deltaTime;
+        pos_.y += velY * speed * deltaTime;
 
         frameCounter++;
         if (frameCounter % 12 == 0) {
             std::string typeName = typeid(*this).name();
             if (typeName.find("Pacman") != std::string::npos) {
-                // std::cout << "Pacman position: (" << pos.x << ", " << pos.y << ")" << std::endl;
             }
         }
 
@@ -93,28 +92,22 @@ namespace logic {
                 tempVelX = m_velX_unit;
                 break;
         }
-        Position proposed = pos;
+        Position proposed = pos_;
         proposed.x += tempVelX * speed * deltaTime;
         proposed.y += tempVelY * speed * deltaTime;
         return proposed;
     }
 
     void DynamicEntity::snapToGrid(float tileWidth, float tileHeight) {
-        // Tile size in world units
-        // tileWidth = 2.0f / gridWidth, tileHeight = 2.0f / gridHeight
+        float xInGrid = (pos_.x + 1.0f) / tileWidth;
+        int tileX = static_cast<int>(round(xInGrid));
+        pos_.x = tileX * tileWidth - 1.0f;
 
-        // Snap X coordinate to nearest tile boundary
-        // We want: pos.x = multiple of tileWidth - 1.0f
-        float xInGrid = (pos.x + 1.0f) / tileWidth; // Convert to grid units
-        int tileX = static_cast<int>(round(xInGrid));      // Round to nearest tile
-        pos.x = tileX * tileWidth - 1.0f;           // Convert back to world
-
-        // Snap Y coordinate to nearest tile boundary
-        float yInGrid = (pos.y + 1.0f) / tileHeight;
+        float yInGrid = (pos_.y + 1.0f) / tileHeight;
         int tileY = static_cast<int>(round(yInGrid));
-        pos.y = tileY * tileHeight - 1.0f;
+        pos_.y = tileY * tileHeight - 1.0f;
 
-        notify(); // Notify observers about position change
+        notify();
     }
 
 } // namespace logic

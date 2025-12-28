@@ -11,15 +11,14 @@ namespace logic
     {
     public:
         virtual ~Subject() = default;
-        void attach(std::unique_ptr<Observer> observer);
-        const std::vector<std::unique_ptr<Observer>>& getObservers() const;
-        virtual void draw(Renderer& renderer);
-
+        void attach(std::shared_ptr<Observer> observer);
+        const std::vector<std::shared_ptr<Observer>>& getObservers() const;
 
     protected:
         void notify() const;
+        void OnEvent(GameEvent event, int data) const;
     private:
-        std::vector<std::unique_ptr<Observer>> observers;
+        std::vector<std::shared_ptr<Observer>> observers;
     };
 } // logic
 

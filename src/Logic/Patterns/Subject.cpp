@@ -1,27 +1,27 @@
 #include "Subject.h"
 
+#include <iostream>
+
 namespace logic
 {
-    void Subject::attach(std::unique_ptr<Observer> observer)
+    void Subject::attach(std::shared_ptr<Observer> observer)
     {
         observers.emplace_back(std::move(observer));
     }
 
-    void Subject::notify() const
-    {
-        for(const auto& observer : observers)
-        {
+    void Subject::notify() const {
+        for(const auto& observer : observers) {
             observer->update();
         }
     }
 
-    const std::vector<std::unique_ptr<Observer>>& Subject::getObservers() const {
-        return observers;
+    void Subject::OnEvent(GameEvent event, int data = 0) const {
+        for(const auto& observer : observers) {
+            observer->onGameEvent(event, data);
+        }
     }
 
-    void Subject::draw(Renderer& renderer) {
-        if (!observers.empty()) {
-            observers.at(0)->draw(renderer);
-        }
+    const std::vector<std::shared_ptr<Observer>>& Subject::getObservers() const {
+        return observers;
     }
 } // logic

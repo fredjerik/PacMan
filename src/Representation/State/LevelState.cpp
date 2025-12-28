@@ -6,14 +6,17 @@
 #include "../../Singleton/RenderWindow.h"
 #include "../FactorySFML.h"
 #include "../View/SFMLRenderer.h"
+#include "../View/Score.h"
 
 namespace state {
 
     LevelState::LevelState(StateManager* stateManager)
-        : State(stateManager),
-          m_factory(std::make_unique<factory::FactorySFML>())
+        : State(stateManager)
     {
-        m_world = std::make_unique<logic::World>("simple_map.txt", m_factory.get());
+        m_score = std::make_shared<logic::Score>();
+        m_factory = std::make_unique<factory::FactorySFML>(m_score);
+        m_world = std::make_unique<logic::World>("maps/official_map"
+                                                 ".txt", m_factory.get());
         int grid_width = m_world->get_gridWidth();
         int grid_height = m_world->get_gridHeight();
 
@@ -26,16 +29,14 @@ namespace state {
         m_gameView.setCenter(windowSize.x / 2.f, windowSize.y / 2.f);
 
         m_uiView = sf::View(sf::FloatRect(0, 0, windowSize.x, windowSize.y));
-
-        // TODO: Load font for UI here
-        // TODO: Setup UI elements (score, lives, etc.) here
+        m_font.loadFromFile("fonts/Pokemon.ttf");
     }
 
     void LevelState::handleInput(sf::Event& event) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Escape) {
                 stateManager_->popState();
-                exit(0); //remove when other states
+                exit(0);
             } else if (event.key.code == sf::Keyboard::D) {
                 m_world->setPacManDirection(logic::Direction::Right);
             } else if (event.key.code == sf::Keyboard::A) {
@@ -49,18 +50,12 @@ namespace state {
     }
 
 
-    void LevelState::update(float deltaTime) {
-        m_world->update(deltaTime);
-    }
-
     void LevelState::draw() {
         sf::RenderWindow& window = singleton::RenderWindow::getInstance();
         window.clear(sf::Color::Black);
 
-        // --- Draw Game World ---
         window.setView(m_gameView);
 
-        // Draw the walls
         for (const auto& pair : m_world->getWalls()) {
             const logic::Position& wallPos = pair.first;
             const logic::Size& wallSize = m_world->getLogicalTileSize();
@@ -77,23 +72,16 @@ namespace state {
             window.draw(wallShape);
         }
 
-        representation::SFMLRenderer renderer(*m_camera);
-        std::vector<logic::Observer*> observers = m_world->getObservers();
-        for (logic::Observer* observer : observers) {
-            observer->draw(renderer);
+        representation::SFMLRenderer renderer(*m_camera /* change this into smart pointer*/);
+        std::vector<std::weak_ptr<logic::Observer>> observers = m_world->getObservers();
+        for (const auto& weakObserver : observers) {
+            if (auto observer = weakObserver.lock()) {
+                observer->draw(renderer);
+            }
         }
-
-        // --- Draw UI in black bars ---
-        window.setView(m_uiView);
-
-        // TODO: Update UI text (score, lives, etc.) here
-        // TODO: Position UI elements based on camera offset
-        // TODO: Draw UI elements in the black bars
-
-        // Example structure:
-        // 1. Get camera offset: m_camera->getViewOffset()
-        // 2. Position score/lives in appropriate black bar area
-        // 3. Draw decorative elements in black bars if desired
     }
 
-} // state
+    void LevelState::update(float deltaTime) {
+        m_world->update(deltaTime);
+    }
+} // state;

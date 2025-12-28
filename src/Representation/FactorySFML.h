@@ -5,6 +5,8 @@
 #include <memory>
 #include "../Logic/Entities/Entity.h"
 #include "View/EntityView.h"
+#include "../Logic/Entities/CollectableEntity.h"
+#include "View/ConsumableView.h"
 
 namespace factory
 {
@@ -12,8 +14,11 @@ namespace factory
     class FactorySFML: public AbstractFactory
     {
     public:
-        FactorySFML() = default;
+        FactorySFML(std::shared_ptr<logic::Score> score) : AbstractFactory(score){}
         std::shared_ptr<logic::PacmanEntity> create_pacman(logic::Position startPos, float velX_unit, float velY_unit) override;
+        std::shared_ptr<logic::Coin> create_coin(logic::Position startPos) override;
+        std::shared_ptr<logic::PowerUp> create_powerup(logic::Position startPos) override;
+        std::shared_ptr<logic::Fruit> create_fruit(logic::Position startPos) override;
     };
 } // factory
 

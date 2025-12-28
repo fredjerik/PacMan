@@ -29,9 +29,6 @@ namespace logic {
         m_gridHeight = m_tiles.size();
         m_gridWidth = m_tiles.empty() ? 0 : m_tiles[0].size();
 
-        // --- FIX ---
-        // Ensure all lines have the same width by padding shorter lines with walls.
-        // This prevents out-of-bounds access on ragged map files.
         for (auto& row : m_tiles) {
             row.resize(m_gridWidth, ' ');
         }
@@ -54,22 +51,22 @@ namespace logic {
                         tileType = TileType::WALL;
                         break;
                     case 'p':
-                        tileType = TileType::PACMAN;
                         entityType = EntityType::PACMAN;
                         isEntity = true;
                         break;
                     case '.':
-                        tileType = TileType::COIN;
                         entityType = EntityType::COIN;
                         isEntity = true;
                         break;
                     case 'o':
-                        tileType = TileType::FRUIT;
+                        entityType = EntityType::POWERUP;
+                        isEntity = true;
+                        break;
+                    case 'f':
                         entityType = EntityType::FRUIT;
                         isEntity = true;
                         break;
                     case 'g':
-                        tileType = TileType::GHOST;
                         entityType = EntityType::GHOST;
                         isEntity = true;
                         break;

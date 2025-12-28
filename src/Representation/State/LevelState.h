@@ -27,9 +27,11 @@ namespace state {
         std::unique_ptr<Camera> m_camera;
         std::unique_ptr<logic::World> m_world;
         std::unique_ptr<factory::FactorySFML> m_factory; // LevelState owns the factory
+        std::shared_ptr<logic::Score> m_score;
 
         sf::View m_gameView;
         sf::View m_uiView;
+        sf::Font m_font;
     };
 
 } // state

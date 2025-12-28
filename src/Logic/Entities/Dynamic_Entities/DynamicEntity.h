@@ -2,16 +2,14 @@
 #define PACMAN_DYNAMICENTITY_H
 
 #include "../Entity.h"
-#include <iostream>
 
 namespace logic {
 
-    // Enum for movement direction
     enum class Direction { None, Up, Down, Left, Right };
 
     class DynamicEntity : public Entity {
     public:
-        explicit DynamicEntity(Position startPos, float velX_unit, float velY_unit);
+        explicit DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit);
 
         void update(float deltaTime) override;
 

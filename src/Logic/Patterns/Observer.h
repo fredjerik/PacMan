@@ -3,15 +3,26 @@
 
 #include "Renderer.h"
 
-namespace logic
-{
-    class Observer
-    {
+namespace logic {
+    enum class GameEvent {
+        None,
+        CollectableCollected,
+        GhostEaten,
+        GhostVulnerable,
+        // ExtraLife,
+        PacmanDied,
+    };
+
+    class Observer {
     public:
         virtual ~Observer() = default;
+
         virtual void update() = 0;
+
+        virtual void onGameEvent(GameEvent event, int data) = 0;
+
         virtual void draw(Renderer& renderer) = 0;
     };
-} // logic
+}
 
 #endif //PACMAN_OBSERVER_H

@@ -10,16 +10,16 @@
 namespace view {
 
     // Base class for all views. It's an Observer.
-    class EntityView : public logic::Observer { // Inherit from view::Observer
+    class EntityView : public logic::Observer {
     public:
         // Constructor for entities that are represented by a sprite
-        EntityView(std::shared_ptr<logic::Entity> model, const sf::IntRect& textureRect);
+        EntityView(std::weak_ptr<logic::Entity> model, const sf::IntRect& textureRect);
         
         virtual ~EntityView() = default;
 
-        // Implementation of the Observer pattern's update method
         void update() override;
 
+        void onGameEvent(logic::GameEvent event, int data) override = 0;
         // The main game loop will call this to draw the entity
         void draw(logic::Renderer& renderer) override;
 
