@@ -1,18 +1,12 @@
 #include "Game.h"
-#include "State/LevelState.h"
 #include "../Singleton/RenderWindow.h"
 #include "Singleton/Stopwatch.h"
+#include "State/MenuState.h"
 
 Game::Game() {
-    // Initialize the StateManager. Game owns the StateManager.
     m_stateManager = std::make_unique<state::StateManager>();
-
-    // Push the initial state (LevelState) onto the stack.
-    // LevelState will be responsible for creating the factory and its world.
-    m_stateManager->pushState(std::make_unique<state::LevelState>(m_stateManager.get()));
-
-    // Initialize the stopwatch
-    singleton::Stopwatch::get_instance().start();
+    // Push MenuState onto stack
+    m_stateManager->pushState(std::make_unique<state::MenuState>(m_stateManager.get()));
 }
 
 void Game::run() {

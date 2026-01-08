@@ -1,8 +1,13 @@
 #include "LevelState.h"
 
+#include <chrono>
 #include <iostream>
+#include <variant>
 
+#include "DefeatState.h"
+#include "PausedState.h"
 #include "StateManager.h"
+#include "VictoryState.h"
 #include "../../Singleton/RenderWindow.h"
 #include "../FactorySFML.h"
 #include "../View/SFMLRenderer.h"
@@ -10,15 +15,14 @@
 
 namespace state {
 
-    LevelState::LevelState(StateManager* stateManager)
-        : State(stateManager)
+    LevelState::LevelState(StateManager* stateManager, const int& current_level, const int& current_score)
+        : State(stateManager), current_level_(current_level)
     {
-        m_score = std::make_shared<logic::Score>();
-        m_factory = std::make_unique<factory::FactorySFML>(m_score);
-        m_world = std::make_unique<logic::World>("maps/official_map"
-                                                 ".txt", m_factory.get());
-        int grid_width = m_world->get_gridWidth();
-        int grid_height = m_world->get_gridHeight();
+        score_ = std::make_shared<logic::Score>();
+        m_factory = std::make_unique<factory::FactorySFML>(score_);
+        world_ = std::make_unique<logic::World>("maps/official_map.txt", m_factory.get());
+        int grid_width = world_->get_gridWidth();
+        int grid_height = world_->get_gridHeight();
 
         sf::RenderWindow& window = singleton::RenderWindow::getInstance();
         sf::Vector2u windowSize = window.getSize();
@@ -35,16 +39,17 @@ namespace state {
     void LevelState::handleInput(sf::Event& event) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Escape) {
-                stateManager_->popState();
-                exit(0);
-            } else if (event.key.code == sf::Keyboard::D) {
-                m_world->setPacManDirection(logic::Direction::Right);
+                // PUSH PauseState onto stack (keeps LevelState underneath)
+                stateManager_->pushState(std::make_unique<PauseState>(stateManager_));
+            }
+            if (event.key.code == sf::Keyboard::D) {
+                world_->setPacManDirection(logic::Direction::Right);
             } else if (event.key.code == sf::Keyboard::A) {
-                m_world->setPacManDirection(logic::Direction::Left);
+                world_->setPacManDirection(logic::Direction::Left);
             } else if (event.key.code == sf::Keyboard::W) {
-                m_world->setPacManDirection(logic::Direction::Up);
+                world_->setPacManDirection(logic::Direction::Up);
             } else if (event.key.code == sf::Keyboard::S) {
-                m_world->setPacManDirection(logic::Direction::Down);
+                world_->setPacManDirection(logic::Direction::Down);
             }
         }
     }
@@ -56,9 +61,9 @@ namespace state {
 
         window.setView(m_gameView);
 
-        for (const auto& pair : m_world->getWalls()) {
+        for (const auto& pair : world_->getWalls()) {
             const logic::Position& wallPos = pair.first;
-            const logic::Size& wallSize = m_world->getLogicalTileSize();
+            const logic::Size& wallSize = world_->getLogicalTileSize();
 
             sf::RectangleShape wallShape;
 
@@ -73,7 +78,7 @@ namespace state {
         }
 
         representation::SFMLRenderer renderer(*m_camera /* change this into smart pointer*/);
-        std::vector<std::weak_ptr<logic::Observer>> observers = m_world->getObservers();
+        std::vector<std::weak_ptr<logic::Observer>> observers = world_->getObservers();
         for (const auto& weakObserver : observers) {
             if (auto observer = weakObserver.lock()) {
                 observer->draw(renderer);
@@ -82,6 +87,16 @@ namespace state {
     }
 
     void LevelState::update(float deltaTime) {
-        m_world->update(deltaTime);
+        world_->update(deltaTime);
+
+        if (world_->victory()) {
+            // Use changeState which handles cleanup properly
+            stateManager_->changeState(std::make_unique<VictoryState>(stateManager_, score_->get_score(), current_level_));
+            return; // Important: return immediately
+        } if (world_->defeat()) {
+            stateManager_->changeState(std::make_unique<DefeatState>(stateManager_, score_->get_score(), current_level_));
+            return; // Important: return immediately
+        }
+
     }
 } // state;

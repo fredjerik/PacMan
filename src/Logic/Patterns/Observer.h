@@ -7,10 +7,10 @@ namespace logic {
     enum class GameEvent {
         None,
         CollectableCollected,
+        GhostModeChanged,
         GhostEaten,
-        GhostVulnerable,
-        // ExtraLife,
         PacmanDied,
+        DirectionChanged
     };
 
     class Observer {

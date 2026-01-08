@@ -1,18 +1,22 @@
 #include "DynamicEntity.h"
 
 #include <cmath>
+#include <iostream>
 #include <typeinfo>
 #include <string>
 
 namespace logic {
 
-    int DynamicEntity::frameCounter = 0;
-
-    DynamicEntity::DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit)
-        : Entity(startPos, size),  currentDirection(Direction::None), speed(1.0f),
-          velX(0.0f), velY(0.0f), m_velX_unit(velX_unit), m_velY_unit(velY_unit){}
+    DynamicEntity::DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit, float speed)
+        : Entity(startPos, size),  currentDirection(Direction::None),
+          velX(0.0f), velY(0.0f), m_velX_unit(velX_unit), m_velY_unit(velY_unit), speed_(speed){}
 
     void DynamicEntity::setDirection(Direction dir) {
+        if (currentDirection != dir)
+        {
+            // Send event with direction as data
+            OnEvent(GameEvent::DirectionChanged, static_cast<int>(dir));
+        }
         currentDirection = dir;
         switch (currentDirection) {
             case Direction::None:
@@ -36,7 +40,9 @@ namespace logic {
                 velY = 0;
                 break;
         }
+
     }
+
     void DynamicEntity::setNextDirection(Direction& dir) {
         nextDirection = dir;
     }
@@ -56,20 +62,13 @@ namespace logic {
     }
 
     float DynamicEntity::getSpeed() const {
-        return speed;
+        return speed_;
     }
 
     void DynamicEntity::update(float deltaTime) {
-        pos_.x += velX * speed * deltaTime;
-        pos_.y += velY * speed * deltaTime;
-
-        frameCounter++;
-        if (frameCounter % 12 == 0) {
-            std::string typeName = typeid(*this).name();
-            if (typeName.find("Pacman") != std::string::npos) {
-            }
-        }
-
+        pos_.x += velX * speed_ * deltaTime;
+        pos_.y += velY * speed_ * deltaTime;
+        // std::cout << to_string(currentDirection) << std::endl;
         notify();
     }
 
@@ -93,8 +92,8 @@ namespace logic {
                 break;
         }
         Position proposed = pos_;
-        proposed.x += tempVelX * speed * deltaTime;
-        proposed.y += tempVelY * speed * deltaTime;
+        proposed.x += tempVelX * speed_ * deltaTime;
+        proposed.y += tempVelY * speed_ * deltaTime;
         return proposed;
     }
 
@@ -109,5 +108,4 @@ namespace logic {
 
         notify();
     }
-
 } // namespace logic

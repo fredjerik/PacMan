@@ -1,5 +1,50 @@
 ############################
 #             p            #
-# ########## ## ########## #
-#                          #
+# ######-### ## ########## #
+#          gg         .    #
 ############################
+
+
+    void GhostView::setupFrames(int normalSpriteX, int normalSpriteY) {
+        // Initialize all frames
+        // Mode 0: Normal (colored ghosts)
+        // Mode 1: Fear (blue/white)
+        // Mode 2: Eaten (just eyes)
+
+        // NORMAL mode frames (colored ghost)
+        // Up direction: 2 frames for animation
+        frames_[0][0].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 300, 35, 35));     // Up frame 1
+        frames_[0][0].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 350, 35, 35)); // Up frame 2
+
+        // Left direction
+        frames_[0][1].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 200, 35, 35));      // Left frame 1
+        frames_[0][1].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 250, 35, 35));  // Left frame 2
+
+        // Down direction
+        frames_[0][2].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 100, 35, 35));     // Down frame 1
+        frames_[0][2].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 150, 35, 35)); // Down frame 2
+
+        // Right direction
+        frames_[0][3].push_back(sf::IntRect(normalSpriteX, normalSpriteY, 35, 35));       // Right frame 1
+        frames_[0][3].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 50, 35, 35));   // Right frame 2
+
+        // Up
+        frames_[1][0].push_back(sf::IntRect(2, 554, 35, 35));      // Blue up frame 1
+        frames_[1][0].push_back(sf::IntRect(2, 604, 35, 35));  // Blue up frame 2
+        frames_[1][0].push_back(sf::IntRect(52, 554, 35, 35));  // Blue up frame 2
+        frames_[1][0].push_back(sf::IntRect(52, 654, 35, 35));  // Blue up frame 2
+
+        // EATEN mode frames (just eyes) - starts at X=270 in sprite sheet
+        int eyesX = 302;
+        // Up eyes
+        frames_[2][0].push_back(sf::IntRect(eyesX, 404, 35, 35));      // Eyes up
+
+        // Left eyes
+        frames_[2][1].push_back(sf::IntRect(eyesX, 354, 35, 35));     // Eyes left
+
+        // Down eyes
+        frames_[2][2].push_back(sf::IntRect(eyesX, 304, 35, 35));    // Eyes down
+
+        // Right eyes
+        frames_[2][3].push_back(sf::IntRect(eyesX, 254, 35, 35));    // Eyes right
+    }

@@ -5,28 +5,28 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Font.hpp>
 
-// Forward declarations
-// class AbstractFactory;
-// namespace state { class StateManager; }
-//
-// namespace state
-// {
-//     class MenuState : public State
-//     {
-//     public:
-//         MenuState(StateManager* stateManager, AbstractFactory* factory);
-//         ~MenuState() override = default;
-//
-//         void handleInput(sf::Event& event) override;
-//         void update(float deltaTime) override;
-//         void draw() override;
-//
-//     private:
-//
-//         sf::Font font_;
-//         sf::Text titleText_;
-//         sf::Text instructionText_;
-//     };
-// }
+namespace state {
+
+    class MenuState : public State {
+    public:
+        explicit MenuState(StateManager* stateManager);
+        void handleInput(sf::Event& event) override;
+        void update(float deltaTime) override;
+        void draw() override;
+
+    private:
+        void initText();
+
+        sf::Font font_;
+        sf::Text titleText_;
+        sf::Text startText_;
+        sf::Text quitText_;
+        sf::Text instructionText_;
+
+        int selectedOption_ = 0; // 0 = Start, 1 = Quit
+    };
+
+} // namespace state
+
 
 #endif //PACMAN_MENUSTATE_H

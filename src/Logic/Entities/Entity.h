@@ -34,6 +34,7 @@ namespace logic {
     protected:
         Position pos_;
         Size size_;
+        // right:
     };
 
 } // namespace logic

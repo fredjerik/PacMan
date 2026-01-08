@@ -1,17 +1,26 @@
 #ifndef PACMAN_PACMAN_H
 #define PACMAN_PACMAN_H
 
+#include <iostream>
+
 #include "DynamicEntity.h"
 
 namespace logic {
 
     class PacmanEntity : public DynamicEntity {
     public:
-        explicit PacmanEntity(Position startPos, float velX_unit, float velY_unit);
-
+        PacmanEntity(Position startPos, float velX_unit, float velY_unit);
 
         int getLives() const { return lives; }
         void loseLife();
+        void reset() override
+        {
+            // std::cout << startPos.x << " " << startPos.y << std::endl;
+            pos_ = startPos;
+            currentDirection = Direction::Right;
+            nextDirection = Direction::Right;
+            OnEvent(GameEvent::DirectionChanged, static_cast<int>(currentDirection));
+        }
 
     private:
         int lives;

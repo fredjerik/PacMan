@@ -14,9 +14,10 @@ namespace state { class StateManager; }
 
 namespace state {
 
+
     class LevelState : public State {
     public:
-        explicit LevelState(StateManager* stateManager);
+        explicit LevelState(StateManager* stateManager, const int& current_level, const int& current_score);
         ~LevelState() override = default;
 
         void handleInput(sf::Event& event) override;
@@ -24,10 +25,11 @@ namespace state {
         void draw() override;
 
     private:
+        const int current_level_;
         std::unique_ptr<Camera> m_camera;
-        std::unique_ptr<logic::World> m_world;
+        std::unique_ptr<logic::World> world_;
         std::unique_ptr<factory::FactorySFML> m_factory; // LevelState owns the factory
-        std::shared_ptr<logic::Score> m_score;
+        std::shared_ptr<logic::Score> score_;
 
         sf::View m_gameView;
         sf::View m_uiView;

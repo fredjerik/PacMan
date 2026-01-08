@@ -2,14 +2,37 @@
 #define PACMAN_DYNAMICENTITY_H
 
 #include "../Entity.h"
-
+#include <string>
 namespace logic {
 
-    enum class Direction { None, Up, Down, Left, Right };
+    enum class Direction
+    {
+        None, Up, Down, Left, Right
+    };
+
+
 
     class DynamicEntity : public Entity {
     public:
-        explicit DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit);
+        // static std::string to_string(Direction dir)
+        // {
+        //     switch (dir)
+        //     {
+        //     case Direction::Up:
+        //         return "Up";
+        //     case Direction::Down:
+        //         return "Down";
+        //     case Direction::Left:
+        //         return "Left";
+        //     case Direction::Right:
+        //         return "Right";
+        //     case Direction::None:
+        //         return "None";
+        //     }
+        //     return "error";
+        // }
+
+        explicit DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit, float speed);
 
         void update(float deltaTime) override;
 
@@ -22,18 +45,18 @@ namespace logic {
         Direction getDirection() const;
         Direction getNextDirection() const;
         float getSpeed() const;
-        void set_speed(float speed_) {speed = speed_;}
+        void set_speed(float speed) {speed_ = speed;}
         void clearNextDirection() {nextDirection = Direction::None;}
+        virtual void reset() = 0;
 
     protected:
         Direction currentDirection;
         Direction nextDirection;
-        float speed;
+        float speed_;
         float velX;
         float velY;
         float m_velX_unit;
         float m_velY_unit;
-        static int frameCounter;
     };
 
 } // namespace Logic

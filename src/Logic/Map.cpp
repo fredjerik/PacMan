@@ -67,8 +67,10 @@ namespace logic {
                         isEntity = true;
                         break;
                     case 'g':
-                        entityType = EntityType::GHOST;
-                        isEntity = true;
+                        tileType = TileType::GHOSTHOUSE;
+                        break;
+                    case '-':
+                        tileType = TileType::GHOSTGATE;
                         break;
                     default:
                         tileType = TileType::EMPTY;

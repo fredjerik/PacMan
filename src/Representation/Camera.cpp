@@ -3,18 +3,14 @@
 #include <algorithm>
 
 void Camera::updateScale() {
-    // Calculate maximum scale that fits within window
     float maxScaleForWidth = static_cast<float>(windowWidth) / static_cast<float>(gridWidth);
     float maxScaleForHeight = static_cast<float>(windowHeight) / static_cast<float>(gridHeight);
 
-    // Use the smaller scale to ensure it fits both dimensions
     uniformScale = std::min(maxScaleForWidth, maxScaleForHeight);
 
-    // Calculate pixel dimensions with chosen scale
     float gridPixelWidth = gridWidth * uniformScale;
     float gridPixelHeight = gridHeight * uniformScale;
 
-    // Center in window
     offsetX = (windowWidth - gridPixelWidth) / 2.0f;
     offsetY = (windowHeight - gridPixelHeight) / 2.0f;
 }

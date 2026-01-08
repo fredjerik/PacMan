@@ -11,12 +11,12 @@ namespace logic {
     enum class TileType {
         WALL,
         EMPTY,
-        GHOSTGATE
+        GHOSTGATE,
+        GHOSTHOUSE
     };
 
     enum class EntityType {
         PACMAN,
-        GHOST,
         COIN,
         POWERUP,
         FRUIT

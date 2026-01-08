@@ -62,6 +62,8 @@ namespace singleton
         }
     }
 
+
+
     float Stopwatch ::tick() {
         auto current_time = std::chrono::steady_clock::now();
 

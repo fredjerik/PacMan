@@ -4,6 +4,8 @@
 #include "State/StateManager.h"
 #include <memory>
 
+#include "State/LevelState.h"
+
 class Game {
 public:
     Game();

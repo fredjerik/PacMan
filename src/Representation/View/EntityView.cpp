@@ -24,8 +24,9 @@ void EntityView::update() {
 
 void EntityView::draw(logic::Renderer& renderer) {
     if (auto model = entity_model_.lock()) {
+        updateAnimation();
         auto& sfmlRenderer = static_cast<representation::SFMLRenderer&>(renderer);
-        
+
         Camera& camera = sfmlRenderer.getCamera();
         sf::RenderWindow& window = singleton::RenderWindow::getInstance(); // Assuming singleton
 
@@ -46,7 +47,6 @@ void EntityView::draw(logic::Renderer& renderer) {
 
         window.draw(sprite_);
 
-        window.draw(sprite_);
     }
 }
 
