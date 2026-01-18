@@ -28,7 +28,6 @@ namespace view
         float frameDuration_ = 0.1f;
         float deathFrameDuration_;
 
-        // NEW: Death animation state tracking
         bool isPlayingDeathAnimation_ = false;
         bool deathAnimationComplete_ = false;
     };

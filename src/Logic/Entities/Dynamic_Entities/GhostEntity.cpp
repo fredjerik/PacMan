@@ -8,16 +8,14 @@ namespace logic
 {
     GhostEntity::GhostEntity(ghost_type ghost_type, const std::vector<Position>& ghost_house,
                              const std::vector<Position>& ghost_gate,
-                             Position scatter_position,
-                             float velX_unit, float velY_unit)
-        : DynamicEntity(ghost_house[0], Size{1, 1}, velX_unit, velY_unit, 3.8f),
+                             Position scatter_position, Size tile_size)
+        : DynamicEntity(ghost_house[0], Size{1, 1}, tile_size, 3.8f),
                         ghost_type_(ghost_type), scatter_corner_(scatter_position), ghost_house_(ghost_house), ghost_gate_(ghost_gate)
     {
-        // update_target_ = true;
-        frame_counter = 0;
         spawn_ = std::make_pair(ghost_gate[0], findClosestHousePosition(ghost_gate[0], ghost_house));
         target = spawn_.second;
         ghost_mode_ = ghost_mode::spawn;
+        mode_before_fear_ = ghost_mode_;
         lastPossibleDirections = {Direction::None};
     }
 
@@ -29,16 +27,6 @@ namespace logic
         return Position{x, y};
     }
 
-    bool GhostEntity::should_update()
-    {
-        if (ghost_mode_ == ghost_mode::chase || ghost_mode_ == ghost_mode::fear)
-        {
-            frame_counter++;
-            if (frame_counter > 6)
-                return true;
-        }
-        return false;
-    }
 
     void GhostEntity::update(float deltaTime) {
 
@@ -49,7 +37,6 @@ namespace logic
         if (ghost_mode_ == ghost_mode::eaten) {
             for (const auto& gatePos : ghost_gate_) {
                 if (distance(pos_, gatePos) < EPSILON) {
-                    // std::cout << "entering" << std::endl;
                     target = spawn_.second;
                     ghost_mode_ = ghost_mode::entering;
                     OnEvent(GameEvent::GhostModeChanged, 0);
@@ -58,7 +45,6 @@ namespace logic
             }
         }
 
-        // Check if entering ghost reached ANY house tile
         else if (ghost_mode_ == ghost_mode::entering) {
             for (const auto& housePos : ghost_house_) {
                 if (distance(pos_, housePos) < EPSILON) {
@@ -115,8 +101,10 @@ namespace logic
     void GhostEntity::scatter()
     {
         ghost_mode_ = ghost_mode::scatter;
-        OnEvent(GameEvent::GhostModeChanged, 0);        target = scatter_corner_;
+        OnEvent(GameEvent::GhostModeChanged, 0);
+        target = scatter_corner_;
     }
+
     void GhostEntity::eaten()
     {
         // std::cout << "eaten" << std::endl;
@@ -124,6 +112,31 @@ namespace logic
         OnEvent(GameEvent::GhostModeChanged, 3);
         OnEvent(GameEvent::GhostEaten, pow(2,score_power_) * 200);
         target = spawn_.first;
+    }
+
+    void GhostEntity::return_from_fear()
+    {
+        switch (mode_before_fear_) {
+        case ghost_mode::chase:
+            chase();
+            break;
+        case ghost_mode::scatter:
+            scatter();
+            break;
+        case ghost_mode::spawn:
+            ghost_mode_ = ghost_mode::spawn;
+            OnEvent(GameEvent::GhostModeChanged, 0);
+            break;
+        case ghost_mode::leaving:
+            leave_house();
+            break;
+        case ghost_mode::entering:
+        case ghost_mode::eaten:
+            break;
+        default:
+            scatter();
+            break;
+        }
     }
 
     void GhostEntity::calculate_direction(const std::vector<Direction>& possible_directions) {
@@ -184,7 +197,6 @@ namespace logic
                std::abs(position_a.y - position_b.y);
     }
 
-
     bool GhostEntity::changed_directions(const std::vector<Direction>& newDirections) {
         std::unordered_set<Direction> newSet(newDirections.begin(), newDirections.end());
 
@@ -200,56 +212,53 @@ namespace logic
         return enteredIntersection;
     }
 
-    //Blinky
-
-    void BlinkyEntity::chase(const ChaseData& data)
-    {
-        ghost_mode_ = ghost_mode::chase;
-        OnEvent(GameEvent::GhostModeChanged, 0);
+    void BlinkyEntity::update_chase_target(const ChaseData& data) {
         target = data.pacman_pos;
     }
 
-    //Pinky
-
-    void PinkyEntity::chase(const ChaseData& data)
-    {
-        ghost_mode_ = ghost_mode::chase;
-        OnEvent(GameEvent::GhostModeChanged, 0);
-        switch (data.pacman_dir)
-        {
-            case Direction::Up:
-                {
-                    target.x = data.pacman_pos.x - size_.width * 4; //funny Easter egg. this was a bug in the original game.
-                    target.y = data.pacman_pos.y - size_.height * 4;
-                    break;
-                }
-            case Direction::Down: target.y = data.pacman_pos.y + size_.height * 4; break;
-            case Direction::Left: target.x = data.pacman_pos.x - size_.width * 4; break;
-            case Direction::Right: target.x = data.pacman_pos.x + size_.width * 4; break;
-            case Direction::None: target = scatter_corner_; break; //for safety
+    // Pinky: Targets 4 tiles ahead of Pac-Man
+    void PinkyEntity::update_chase_target(const ChaseData& data) {
+        switch (data.pacman_dir) {
+        case Direction::Up:
+            target.x = data.pacman_pos.x - size_.width * 4;
+            target.y = data.pacman_pos.y - size_.height * 4;
+            break;
+        case Direction::Down:
+            target.y = data.pacman_pos.y + size_.height * 4;
+            break;
+        case Direction::Left:
+            target.x = data.pacman_pos.x - size_.width * 4;
+            break;
+        case Direction::Right:
+            target.x = data.pacman_pos.x + size_.width * 4;
+            break;
+        case Direction::None:
+            target = scatter_corner_;
+            break;
         }
     }
 
-    //Inky
-
-    void InkyEntity::chase(const ChaseData& data)
-    {
-        ghost_mode_ = ghost_mode::chase;
-        OnEvent(GameEvent::GhostModeChanged, 0);
+    // Inky: Uses Blinky's position and Pac-Man's position to calculate target
+    void InkyEntity::update_chase_target(const ChaseData& data) {
         Position intermediate = data.pacman_pos;
-        switch (data.pacman_dir)
-        {
-            case Direction::Up:
-                {
-                    intermediate.x = data.pacman_pos.x - size_.width * 2; //same bug here, just with 2 squares instead of 4
-                    intermediate.y = data.pacman_pos.y - size_.height * 2;
-                    break;
-                }
-            case Direction::Down: intermediate.y = data.pacman_pos.y + size_.height * 2; break;
-            case Direction::Left: intermediate.x = data.pacman_pos.x - size_.width * 2; break;
-            case Direction::Right: intermediate.x = data.pacman_pos.x + size_.width * 2; break;
-            case Direction::None: break;
+        switch (data.pacman_dir) {
+        case Direction::Up:
+            intermediate.x = data.pacman_pos.x - size_.width * 2;
+            intermediate.y = data.pacman_pos.y - size_.height * 2;
+            break;
+        case Direction::Down:
+            intermediate.y = data.pacman_pos.y + size_.height * 2;
+            break;
+        case Direction::Left:
+            intermediate.x = data.pacman_pos.x - size_.width * 2;
+            break;
+        case Direction::Right:
+            intermediate.x = data.pacman_pos.x + size_.width * 2;
+            break;
+        case Direction::None:
+            break;
         }
+
         float dx = intermediate.x - data.blinky_pos.x;
         float dy = intermediate.y - data.blinky_pos.y;
 
@@ -257,19 +266,13 @@ namespace logic
         target.y = intermediate.y + dy;
     }
 
-    //Clyde
-
-    void ClydeEntity::chase(const ChaseData& data)
-    {
-        ghost_mode_ = ghost_mode::chase;
-        OnEvent(GameEvent::GhostModeChanged, 0);
-        if (distance(pos_,data.pacman_pos) < visibility_)
-        {
-            // target = scatter_corner_;   // this is the official logic but its boring.
+    // Clyde: Random target when close to Pac-Man, otherwise targets Pac-Man
+    void ClydeEntity::update_chase_target(const ChaseData& data) {
+        if (distance(pos_, data.pacman_pos) < visibility_) {
             auto& random = singleton::Random::get_instance();
             target = Position{random.get_float(-1,1), random.get_float(-1,1)};
-            return;
+        } else {
+            target = data.pacman_pos;
         }
-        target = data.pacman_pos;
     }
 } // logic

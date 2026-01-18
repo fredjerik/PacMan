@@ -17,8 +17,8 @@ namespace logic {
 
     struct duration
     {
-        std::vector<float> CHASE = {20.0f, 20.0f, 20.0f, std::numeric_limits<float>::max()}; // official timings
-        std::vector<float> SCATTER = {7.0f, 7.0f, 5.0f, 5.0f}; // official timings
+        std::vector<float> CHASE = {20.0f, 20.0f, 20.0f, std::numeric_limits<float>::max()};
+        std::vector<float> SCATTER = {7.0f, 7.0f, 5.0f, 5.0f};
         float fear = 6.0f;
         float fear_low = 1.5f;
         float death_delay = 1.3f;
@@ -34,46 +34,51 @@ namespace logic {
 
         void update(float deltaTime);
         void setPacManDirection(Direction dir);
-        std::vector<std::weak_ptr<Observer>> getObservers();
-        const std::vector<std::vector<bool>>& getWallGrid() const { return wall_grid_; }
-        const std::map<Position, bool>& getWalls() const { return walls_; }
-        const int get_gridWidth() const { return grid_width_; }
-        const int get_gridHeight() const { return grid_height_; }
-        const Size getLogicalTileSize() const { return tile_size_; }
-        bool change_direction(const Position& currentPos, Direction currentDir, Direction newDir) const;
-        static bool isReverseDirection(Direction dir1, Direction dir2);
-        static Direction getReverseDirection(Direction dir1);
+        [[nodiscard]] std::vector<std::weak_ptr<Observer>> getObservers() const;
+        [[nodiscard]] const std::vector<std::vector<bool>>& getWallGrid() const { return wall_grid_; }
+        [[nodiscard]] const std::map<Position, bool>& getWalls() const { return walls_; }
+        [[nodiscard]] int get_gridWidth() const { return grid_width_; }
+        [[nodiscard]] int get_gridHeight() const { return grid_height_; }
+        [[nodiscard]] Size getLogicalTileSize() const { return tile_size_; }
+        [[nodiscard]] bool change_direction(const Position& currentPos, Direction currentDir, Direction newDir) const;
         void set_fear_timer(float fear) { global_duration_.fear = fear; }
-        bool victory() const { if (victory_){ std::cout << "yippie" << std::endl;}return victory_;}
-        bool defeat() const {return defeat_;};
+        [[nodiscard]] bool victory() const {return victory_;}
+        [[nodiscard]] bool defeat() const {return defeat_;}
 
     private:
+
         bool isPacmanDying = false;
         float deathAnimationTime = 0;
         int ghosts_eaten;
         duration global_duration_;
         float timer_;
-        float paused_timer;
+        float fear_timer_;
+        float death_timer_ = 0.0f;
         ghost_mode global_ghost_mode_;
         ghost_mode prev_ghost_mode_;
 
-        void switch_ghost_mode(bool powerup_eaten);
-        std::vector<Direction> getPossibleDirections(Position pos, Direction current_direction, ghost_mode ghost_mode) const;
-        void update_ghost_target();
-        bool isMoveValid(const Position& futurePos, Direction dir, ghost_mode ghost_mode) const;
-        bool isWallAt(const Position& point) const;
-        bool isEntranceAt(const Position& point) const;
-        std::pair<int, int> worldToGrid(const Position& pos) const;
+        void start_scatter_mode();
+        void start_chase_mode();
+        void start_flashing_mode();
+        void return_from_fear_mode();
+        [[nodiscard]] std::vector<Direction> getPossibleDirections(Position pos, Direction current_direction, ghost_mode ghost_mode) const;
+        [[nodiscard]] bool isWallAt(const Position& point) const;
+        [[nodiscard]] bool isEntranceAt(const Position& point) const;
+        [[nodiscard]] std::pair<int, int> worldToGrid(const Position& pos) const;
         void CollectableCollision();
-        bool isValidGridPosition(int gridX, int gridY) const;
+        [[nodiscard]] bool isValidGridPosition(int gridX, int gridY) const;
         void reset();
+        void handle_timer_expired();
+        void handle_ghost_releasing(float deltaTime);
+
+        // New method to update ghost chase targets
+        void update_ghost_chase_targets();
 
         // collision
-        bool isWallCollision(const Position& entityPos, const Size& entitySize, Direction dir) const;
-        bool isGateCollision(const Position& entityPos, const Size& entitySize, Direction dir, ghost_mode mode) const;
-        bool checkEntityCollision(const Position& entityPos1, const Size& size1,
+        [[nodiscard]] bool isWallCollision(const Position& entityPos, const Size& entitySize, Direction dir) const;
+        [[nodiscard]] bool isGateCollision(const Position& entityPos, const Size& entitySize, Direction dir, ghost_mode mode) const;
+        [[nodiscard]] bool checkEntityCollision(const Position& entityPos1, const Size& size1,
                                   const Position& entityPos2, const Size& size2) const;
-        // void handlePacmanGhostCollision(std::shared_ptr<GhostEntity> ghost, float delta_time);
 
         factory::AbstractFactory* factory_;
         bool pacman_eaten = false;

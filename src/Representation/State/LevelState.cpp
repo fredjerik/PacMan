@@ -39,7 +39,6 @@ namespace state {
     void LevelState::handleInput(sf::Event& event) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Escape) {
-                // PUSH PauseState onto stack (keeps LevelState underneath)
                 stateManager_->pushState(std::make_unique<PauseState>(stateManager_));
             }
             if (event.key.code == sf::Keyboard::D) {
@@ -90,13 +89,12 @@ namespace state {
         world_->update(deltaTime);
 
         if (world_->victory()) {
-            // Use changeState which handles cleanup properly
             stateManager_->changeState(std::make_unique<VictoryState>(stateManager_, score_->get_score(), current_level_));
-            return; // Important: return immediately
-        } if (world_->defeat()) {
+            return;
+        }
+        if (world_->defeat()) {
             stateManager_->changeState(std::make_unique<DefeatState>(stateManager_, score_->get_score(), current_level_));
-            return; // Important: return immediately
         }
 
     }
-} // state;
+} // state

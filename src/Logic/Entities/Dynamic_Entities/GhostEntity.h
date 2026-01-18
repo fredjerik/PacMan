@@ -12,6 +12,7 @@ namespace logic
         chase,
         scatter,
         fear,
+        flashing,
         eaten,
         entering,
         leaving,
@@ -37,7 +38,7 @@ namespace logic
     class GhostEntity : public DynamicEntity
     {
     public:
-        const float EPSILON = size_.width * 0.01f;
+        const float EPSILON = tile_size_.width * 0.1f;
 
         static std::string to_string(ghost_mode ghost_mode)
         {
@@ -62,20 +63,24 @@ namespace logic
         }
 
         GhostEntity(ghost_type ghost_type, const std::vector<Position>& ghost_house,
-                    const std::vector<Position>& ghost_gate,
-                    Position scatter_position,
-                    float velX_unit, float velY_unit);
+                                 const std::vector<Position>& ghost_gate,
+                                 Position scatter_position, Size tile_size);
         void calculate_direction(const std::vector<Direction>& possible_directions);
+        bool shouldAllowReverse() const;
         void update(float deltaTime) override;
-        void leave_house() {std::cout << "leaving house" << std::endl; ghost_mode_ = ghost_mode::leaving;};
+        void leave_house() {ghost_mode_ = ghost_mode::leaving;};
         static Position findClosestHousePosition(const Position& gate_pos, const std::vector<Position>& ghost_house);
 
-        virtual void chase(const ChaseData& data) = 0;// all logic from https://www.youtube.com/watch?v=ataGotQ7ir8&t=681s
+        void chase() {
+            ghost_mode_ = ghost_mode::chase;
+            OnEvent(GameEvent::GhostModeChanged, 0);
+        }
+        virtual void update_chase_target(const ChaseData& data) = 0;// all logic from https://www.youtube.com/watch?v=ataGotQ7ir8&t=681s
         void fear(const Position& pacman_position);
         void low_fear() {OnEvent(GameEvent::GhostModeChanged, 2);}
         void eaten();
         void scatter();
-        bool should_update();
+        void return_from_fear();
         bool changed_directions(const std::vector<Direction>& newDirections);
         void set_visibility(const float visibility) {visibility_ = size_.width * visibility;}
         ghost_type get_ghost_type() {return ghost_type_;}
@@ -83,22 +88,22 @@ namespace logic
 
         void set_score_power(const int& score_power) {score_power_ = score_power;}
         void reset() override;
+        static float distance(const Position& position_a, const Position& position_b);
 
     private:
         std::unordered_set<Direction> lastPossibleDirections;
-        // void enter_house();
 
     protected:
         std::vector<Position> ghost_house_;
         std::vector<Position> ghost_gate_;
         ghost_type ghost_type_;
-        static float distance(const Position& position_a, const Position& position_b) ;
+        // static float euclideanDistance(const Position& position_a, const Position& position_b);
         static Position random();
 
         float visibility_ = 8.0f * size_.width;
         ghost_mode ghost_mode_;
+        ghost_mode mode_before_fear_;
         Position target;
-        float frame_counter;
         std::pair<Position, Position> spawn_; // first is entrance, second is actual spawn.
         Position scatter_corner_;
         int score_power_ = 1; //200 ** score_multiplier
@@ -109,10 +114,10 @@ namespace logic
     public:
         BlinkyEntity(const std::vector<Position>& ghost_house,
                              const std::vector<Position>& ghost_gate,
-                             float velX_unit, float velY_unit)
-            : GhostEntity(ghost_type::Blinky, ghost_house, ghost_gate, Position{1, -1}, velX_unit,velY_unit){}
+                             Size tile_size)
+            : GhostEntity(ghost_type::Blinky, ghost_house, ghost_gate, Position{1, -1}, tile_size){}
 
-        void chase(const ChaseData& data) override;
+        void update_chase_target(const ChaseData& data) override;
     };
 
     class PinkyEntity : public GhostEntity
@@ -120,10 +125,10 @@ namespace logic
     public:
         PinkyEntity(const std::vector<Position>& ghost_house,
                              const std::vector<Position>& ghost_gate,
-                             float velX_unit, float velY_unit)
-            : GhostEntity(ghost_type::Pinky, ghost_house, ghost_gate, Position{-1, -1}, velX_unit,velY_unit){}
+                             Size tile_size)
+            : GhostEntity(ghost_type::Pinky, ghost_house, ghost_gate, Position{-1, -1}, tile_size){}
 
-        void chase(const ChaseData& data) override;
+        void update_chase_target(const ChaseData& data) override;
     };
 
     class InkyEntity : public GhostEntity
@@ -131,10 +136,10 @@ namespace logic
     public:
         InkyEntity(const std::vector<Position>& ghost_house,
                              const std::vector<Position>& ghost_gate,
-                             float velX_unit, float velY_unit)
-            : GhostEntity(ghost_type::Inky, ghost_house, ghost_gate, Position{1, 1}, velX_unit,velY_unit){}
+                             Size tile_size)
+            : GhostEntity(ghost_type::Inky, ghost_house, ghost_gate, Position{1, 1}, tile_size){}
 
-        void chase(const ChaseData& data) override;
+        void update_chase_target(const ChaseData& data) override;
     };
 
     class ClydeEntity : public GhostEntity
@@ -142,10 +147,10 @@ namespace logic
     public:
         ClydeEntity(const std::vector<Position>& ghost_house,
                              const std::vector<Position>& ghost_gate,
-                             float velX_unit, float velY_unit)
-            : GhostEntity(ghost_type::Clyde, ghost_house, ghost_gate, Position{-1, 1}, velX_unit,velY_unit){}
+                             Size tile_size)
+            : GhostEntity(ghost_type::Clyde, ghost_house, ghost_gate, Position{-1, 1}, tile_size){}
 
-        void chase(const ChaseData& data) override;
+        void update_chase_target(const ChaseData& data) override;
     };
 } // logic
 

@@ -3,7 +3,6 @@
 #include "EntityView.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include <array>
 #include "Logic/Entities/Dynamic_Entities/GhostEntity.h"
 
 namespace view
@@ -17,15 +16,31 @@ namespace view
         void updateAnimation() override;
 
     protected:
-        std::array<std::array<std::vector<sf::IntRect>, 4>, 4> frames_;
+        // Normal mode frames (colored ghost)
+        std::vector<sf::IntRect> normalUpFrames;
+        std::vector<sf::IntRect> normalLeftFrames;
+        std::vector<sf::IntRect> normalDownFrames;
+        std::vector<sf::IntRect> normalRightFrames;
+
+        // Fear mode frames (solid blue)
+        std::vector<sf::IntRect> fearFrames;
+
+        // Fear flashing mode frames (blue/white alternating)
+        std::vector<sf::IntRect> fearFlashingFrames;
+
+        // Eaten mode frames (just eyes)
+        std::vector<sf::IntRect> eatenUpFrames;
+        std::vector<sf::IntRect> eatenLeftFrames;
+        std::vector<sf::IntRect> eatenDownFrames;
+        std::vector<sf::IntRect> eatenRightFrames;
 
         logic::Direction currentDirection_ = logic::Direction::Left;
         int currentMode_ = 0; // 0=normal, 1=fear, 2=fear flashing, 3=eaten
         int currentFrame_ = 0;
-        float animationTimer_ = 0.0f;
-        float frameDuration_ = 0.15f;
+        int frameCounter_ = 0;
 
         void setupFrames(int normalSpriteX, int normalSpriteY);
+        const std::vector<sf::IntRect>& getCurrentFrames() const;
     };
 
     class BlinkyView : public GhostView {

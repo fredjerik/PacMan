@@ -5,26 +5,18 @@
 
 Game::Game() {
     m_stateManager = std::make_unique<state::StateManager>();
-    // Push MenuState onto stack
     m_stateManager->pushState(std::make_unique<state::MenuState>(m_stateManager.get()));
 }
 
 void Game::run() {
 
-    // float deltaTime = singleton::Stopwatch::get_instance().tick(); // Get deltaTime from stopwatch
-    // handleEvents();
-    // update(deltaTime); // Pass float deltaTime
-    // render();
-    /**
-     * actual game
-     */
     while (singleton::RenderWindow::getInstance().isOpen()) {
-        float deltaTime = singleton::Stopwatch::get_instance().tick(); // Get deltaTime from stopwatch
+        float deltaTime = singleton::Stopwatch::get_instance().tick();
         handleEvents();
-        update(deltaTime); // Pass float deltaTime
+        update(deltaTime);
         render();
     }
-    singleton::Stopwatch::get_instance().stop(); // Stop the stopwatch when the Game ends
+    singleton::Stopwatch::get_instance().stop();
 }
 
 void Game::handleEvents() {
@@ -33,19 +25,16 @@ void Game::handleEvents() {
         if (event.type == sf::Event::Closed)
             singleton::RenderWindow::getInstance().close();
 
-        // Delegate event handling to the active State
         m_stateManager->handleInput(event);
     }
 }
 
 void Game::update(float deltaTime) {
-    // Delegate updating to the active State
     m_stateManager->update(deltaTime);
 }
 
 void Game::render() {
     singleton::RenderWindow::getInstance().clear();
-    // Delegate drawing to the active State
     m_stateManager->draw();
     singleton::RenderWindow::getInstance().display();
 }

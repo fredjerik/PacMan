@@ -16,7 +16,6 @@ namespace state {
 
         initText();
 
-        // Create semi-transparent background
         auto& window = singleton::RenderWindow::getInstance();
         background_.setSize(sf::Vector2f(window.getSize()));
         background_.setFillColor(sf::Color(0, 0, 0, 200)); // Semi-transparent black
@@ -26,7 +25,6 @@ namespace state {
         auto& window = singleton::RenderWindow::getInstance();
         sf::Vector2u windowSize = window.getSize();
 
-        // Defeat text
         defeatText_.setFont(font_);
         defeatText_.setString("GAME OVER");
         defeatText_.setCharacterSize(80);
@@ -38,18 +36,16 @@ namespace state {
                              defeatBounds.top + defeatBounds.height / 2.0f);
         defeatText_.setPosition(windowSize.x / 2.0f, windowSize.y * 0.3f);
 
-        // Score text
         scoreText_.setFont(font_);
         scoreText_.setString("Score: " + std::to_string(score_));
         scoreText_.setCharacterSize(40);
         scoreText_.setFillColor(sf::Color::Yellow);
 
-        sf::FloatRect scoreBounds = scoreText_.getLocalBounds();
+        const sf::FloatRect scoreBounds = scoreText_.getLocalBounds();
         scoreText_.setOrigin(scoreBounds.left + scoreBounds.width / 2.0f,
                             scoreBounds.top + scoreBounds.height / 2.0f);
         scoreText_.setPosition(windowSize.x / 2.0f, windowSize.y * 0.5f);
 
-        // Level text
         levelText_.setFont(font_);
         levelText_.setString("Level: " + std::to_string(level_));
         levelText_.setCharacterSize(40);
@@ -60,7 +56,6 @@ namespace state {
                             levelBounds.top + levelBounds.height / 2.0f);
         levelText_.setPosition(windowSize.x / 2.0f, windowSize.y * 0.6f);
 
-        // Instruction text
         instructionText_.setFont(font_);
         instructionText_.setString("Press SPACE to retry\nPress ESC for menu");
         instructionText_.setCharacterSize(30);
@@ -75,28 +70,23 @@ namespace state {
 
     void DefeatState::handleInput(sf::Event& event) {
         if (event.type == sf::Event::KeyPressed) {
+
             if (event.key.code == sf::Keyboard::Escape) {
-                // Return to main menu
                 stateManager_->changeState(std::make_unique<MenuState>(stateManager_));
-            } else if (event.key.code == sf::Keyboard::Space) {
-                // Retry current level
+            }
+
+            else if (event.key.code == sf::Keyboard::Space) {
                 stateManager_->changeState(std::make_unique<LevelState>(stateManager_, 1, 0));
             }
         }
-    }
-
-    void DefeatState::update(float deltaTime) {
-        // Nothing to update in defeat screen
     }
 
     void DefeatState::draw() {
         auto& window = singleton::RenderWindow::getInstance();
         window.clear(sf::Color::Black);
 
-        // Draw background
         window.draw(background_);
 
-        // Draw texts
         window.draw(defeatText_);
         window.draw(scoreText_);
         window.draw(levelText_);

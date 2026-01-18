@@ -17,7 +17,7 @@ namespace singleton
         if (!running) {
             start_time = std::chrono::steady_clock::now();
             running = true;
-            paused = false; // Make sure it's not paused when starting
+            paused = false;
         }
     }
 

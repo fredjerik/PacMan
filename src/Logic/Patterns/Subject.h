@@ -12,7 +12,7 @@ namespace logic
     public:
         virtual ~Subject() = default;
         void attach(std::shared_ptr<Observer> observer);
-        const std::vector<std::shared_ptr<Observer>>& getObservers() const;
+        [[nodiscard]] const std::vector<std::shared_ptr<Observer>>& getObservers() const;
 
     protected:
         void notify() const;

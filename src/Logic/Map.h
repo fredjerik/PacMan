@@ -33,16 +33,16 @@ namespace logic {
     public:
         explicit Map(const std::string& filePath);
 
-        const std::map<Position, TileType>& getTileData() const;
-        const std::vector<EntityCreationData>& getEntityData() const;
-        int getGridWidth() const;
-        int getGridHeight() const;
+        [[nodiscard]] const std::map<Position, TileType>& getTileData() const;
+        [[nodiscard]] const std::vector<EntityCreationData>& getEntityData() const;
+        [[nodiscard]] int getGridWidth() const;
+        [[nodiscard]] int getGridHeight() const;
 
     private:
         void loadFromFile(const std::string& filePath);
         void parseTiles();
-        Position gridToTopLeft(int x, int y) const;
-        Size getLogicalTileSize() const;
+        [[nodiscard]] Position gridToTopLeft(int x, int y) const;
+        [[nodiscard]] Size getLogicalTileSize() const;
 
         int m_gridWidth = 0;
         int m_gridHeight = 0;

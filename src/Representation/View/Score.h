@@ -18,15 +18,15 @@ namespace logic
             current_score = 0;
         }
 
-        int get_score(){ return current_score; }
-        int get_lives() { return pacman_lives; }
+        [[nodiscard]] int get_score() const { return current_score; }
+        [[nodiscard]] int get_lives() const { return pacman_lives; }
         void set_lives(int lives) { pacman_lives = lives; }
 
         void update() override
         {
         }
 
-        void onGameEvent(GameEvent event, int data) override
+        void onGameEvent(const GameEvent event, const int data) override
         {
             if (event == GameEvent::CollectableCollected)
             {
@@ -41,10 +41,6 @@ namespace logic
             else if (event == GameEvent::PacmanDied)
             {
                 pacman_lives -= data;
-            }
-            else
-            {
-                std::cerr << "Incorrect Event!" << std::endl;
             }
         }
 

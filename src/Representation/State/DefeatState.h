@@ -12,7 +12,7 @@ namespace state {
     public:
         DefeatState(StateManager* stateManager, int score, int level);
         void handleInput(sf::Event& event) override;
-        void update(float deltaTime) override;
+        void update(float deltaTime) override {}
         void draw() override;
 
     private:
@@ -29,6 +29,6 @@ namespace state {
         sf::RectangleShape background_;
     };
 
-} // namespace state
+} // state
 
 #endif //PACMAN_DEFEATSTATE_H

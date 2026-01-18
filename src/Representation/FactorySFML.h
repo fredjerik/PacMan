@@ -15,18 +15,18 @@ namespace factory
     {
     public:
         FactorySFML(std::shared_ptr<logic::Score> score) : AbstractFactory(score){}
-        std::shared_ptr<logic::PacmanEntity> create_pacman(logic::Position startPos, float velX_unit, float velY_unit) override;
-        std::shared_ptr<logic::Coin> create_coin(logic::Position startPos) override;
-        std::shared_ptr<logic::PowerUp> create_powerup(logic::Position startPos) override;
-        std::shared_ptr<logic::Fruit> create_fruit(logic::Position startPos) override;
+        std::shared_ptr<logic::PacmanEntity> create_pacman(logic::Position startPos, logic::Size tile_size) override;
+        std::shared_ptr<logic::Coin> create_coin(logic::Position startPos, logic::Size tile_size) override;
+        std::shared_ptr<logic::PowerUp> create_powerup(logic::Position startPos, logic::Size tile_size) override;
+        std::shared_ptr<logic::Fruit> create_fruit(logic::Position startPos, logic::Size tile_size) override;
         std::shared_ptr<logic::BlinkyEntity> create_blinky(const std::vector<logic::Position>& ghost_house,
-            const std::vector<logic::Position>& ghost_gate, float velX_unit, float velY_unit) override;
+            const std::vector<logic::Position>& ghost_gate, logic::Size tile_size) override;
         std::shared_ptr<logic::PinkyEntity> create_pinky(const std::vector<logic::Position>& ghost_house,
-            const std::vector<logic::Position>& ghost_gate, float velX_unit, float velY_unit) override;
+            const std::vector<logic::Position>& ghost_gate, logic::Size tile_size) override;
         std::shared_ptr<logic::InkyEntity> create_inky(const std::vector<logic::Position>& ghost_house,
-            const std::vector<logic::Position>& ghost_gate, float velX_unit, float velY_unit) override;
+            const std::vector<logic::Position>& ghost_gate, logic::Size tile_size) override;
         std::shared_ptr<logic::ClydeEntity> create_clyde(const std::vector<logic::Position>& ghost_house,
-            const std::vector<logic::Position>& ghost_gate, float velX_unit, float velY_unit) override;
+            const std::vector<logic::Position>& ghost_gate, logic::Size tile_size) override;
 
     };
 } // factory

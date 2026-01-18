@@ -9,13 +9,12 @@ namespace logic {
 
     class PacmanEntity : public DynamicEntity {
     public:
-        PacmanEntity(Position startPos, float velX_unit, float velY_unit);
+        PacmanEntity(Position startPos, Size tile_size);
 
         int getLives() const { return lives; }
         void loseLife();
         void reset() override
         {
-            // std::cout << startPos.x << " " << startPos.y << std::endl;
             pos_ = startPos;
             currentDirection = Direction::Right;
             nextDirection = Direction::Right;

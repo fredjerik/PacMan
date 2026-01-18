@@ -12,7 +12,7 @@ namespace logic
     };
     class CollectableEntity: public Entity {
     public:
-        CollectableEntity(Position pos, Size size) : Entity(pos, size)
+        CollectableEntity(Position pos, Size size, Size tile_size) : Entity(pos, size, tile_size)
         {
             collected = false;
             value = 0;
@@ -26,7 +26,7 @@ namespace logic
             notify();
         }
         void update(float deltaTime) override {}
-        virtual CollectableType getType() const = 0;
+        [[nodiscard]] virtual CollectableType getType() const = 0;
 
     protected:
         bool collected;
@@ -35,31 +35,31 @@ namespace logic
 
     class Coin : public CollectableEntity {
     public:
-        Coin(Position pos) : CollectableEntity(pos, Size{0.3,0.3})
+        Coin(Position pos, Size tile_size) : CollectableEntity(pos, Size{0.3,0.3}, tile_size)
         {
             value = 10;
         }
-        CollectableType getType() const override { return CollectableType::Coin; }
+        [[nodiscard]] CollectableType getType() const override { return CollectableType::Coin; }
     };
 
     class PowerUp : public CollectableEntity
     {
     public:
-        PowerUp(Position pos) : CollectableEntity(pos, Size{0.8,0.8})
+        PowerUp(Position pos, Size tile_size) : CollectableEntity(pos, Size{0.8,0.8}, tile_size)
         {
             value = 50;
         }
-        CollectableType getType() const override { return CollectableType::PowerUp; }
+        [[nodiscard]] CollectableType getType() const override { return CollectableType::PowerUp; }
     };
 
     class Fruit : public CollectableEntity
     {
     public:
-        Fruit(Position pos) : CollectableEntity(pos, Size{0.8,0.8})
+        Fruit(Position pos, Size tile_size) : CollectableEntity(pos, Size{0.8,0.8}, tile_size)
         {
             value = 100;
         }
-        CollectableType getType() const override { return CollectableType::Fruit; }
+        [[nodiscard]] CollectableType getType() const override { return CollectableType::Fruit; }
     };
 
 } // logic

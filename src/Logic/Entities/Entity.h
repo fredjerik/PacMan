@@ -23,17 +23,18 @@ namespace logic {
 
     class Entity: public Subject {
     public:
-        explicit Entity(Position startPos, Size size) : pos_(startPos), size_(size) {}
+        explicit Entity(Position startPos, Size size, Size tile_size) : pos_(startPos), size_(size), tile_size_(tile_size) {}
         ~Entity() override = default;
 
         virtual void update(float deltaTime) = 0;
 
-        Position getPosition() const { return pos_; }
-        Size getSize() const { return size_; }
+        [[nodiscard]] Position getPosition() const { return pos_; }
+        [[nodiscard]] Size getSize() const { return size_; }
 
     protected:
         Position pos_;
         Size size_;
+        Size tile_size_;
         // right:
     };
 

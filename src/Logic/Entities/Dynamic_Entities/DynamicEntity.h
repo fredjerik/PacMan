@@ -10,35 +10,35 @@ namespace logic {
         None, Up, Down, Left, Right
     };
 
-
+    static std::string dir_to_string(Direction dir)
+    {
+        switch (dir)
+        {
+        case Direction::Up:
+            return "Up";
+        case Direction::Down:
+            return "Down";
+        case Direction::Left:
+            return "Left";
+        case Direction::Right:
+            return "Right";
+        case Direction::None:
+            return "None";
+        }
+        return "error";
+    }
 
     class DynamicEntity : public Entity {
     public:
-        // static std::string to_string(Direction dir)
-        // {
-        //     switch (dir)
-        //     {
-        //     case Direction::Up:
-        //         return "Up";
-        //     case Direction::Down:
-        //         return "Down";
-        //     case Direction::Left:
-        //         return "Left";
-        //     case Direction::Right:
-        //         return "Right";
-        //     case Direction::None:
-        //         return "None";
-        //     }
-        //     return "error";
-        // }
-
-        explicit DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit, float speed);
+        explicit DynamicEntity(Position startPos, Size size, Size tile_size, float speed);
 
         void update(float deltaTime) override;
 
         Position getProposedPosition(float deltaTime, Direction dir) const;
         void snapToGrid(float tileWidth, float tileHeight);
 
+        static Direction getReverseDirection(Direction dir1);
+        static bool isReverseDirection(Direction dir1, Direction dir2);
         void setDirection(Direction dir);
         void setNextDirection(Direction& dir);
         void setPosition(Position& pos_);

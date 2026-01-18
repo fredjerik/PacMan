@@ -55,12 +55,12 @@ namespace logic
         sprite.setTexture(texture);
         sprite.setTextureRect(sf::IntRect(852, 54, 35, 35));
 
-        float startX = 270.0f;
-        float startY = 220.0f;
-        float spacing = 40.0f;
 
         for (int i = 0; i < pacman_lives; i++) {
-            sprite.setPosition(startX + (i * spacing), startY);
+            constexpr float spacing = 40.0f;
+            constexpr float startY = 220.0f;
+            constexpr float startX = 270.0f;
+            sprite.setPosition(startX + i * spacing, startY);
             window.draw(sprite);
         }
     }

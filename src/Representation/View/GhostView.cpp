@@ -1,5 +1,4 @@
 #include "GhostView.h"
-#include "Singleton/Stopwatch.h"
 #include <iostream>
 
 namespace view
@@ -12,145 +11,93 @@ namespace view
     }
 
     void GhostView::setupFrames(int normalSpriteX, int normalSpriteY) {
-        // Initialize all frames
-        // Mode 0: Normal (colored ghosts)
-        // Mode 1: Fear (solid blue)
-        // Mode 2: Fear flashing (blue/white alternating)
-        // Mode 3: Eaten (just eyes)
+        // NORMAL mode frames (colored ghost) - 2 frames each
+        normalUpFrames.emplace_back(normalSpriteX, normalSpriteY + 300, 35, 35);
+        normalUpFrames.emplace_back(normalSpriteX, normalSpriteY + 350, 35, 35);
 
-        // NORMAL mode frames (colored ghost)
-        // Up direction: 2 frames for animation
-        frames_[0][0].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 300, 35, 35));     // Up frame 1
-        frames_[0][0].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 300, 35, 35));     // Up frame 1
-        frames_[0][0].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 350, 35, 35));     // Up frame 2
-        frames_[0][0].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 350, 35, 35));     // Up frame 2
+        normalLeftFrames.emplace_back(normalSpriteX, normalSpriteY + 200, 35, 35);
+        normalLeftFrames.emplace_back(normalSpriteX, normalSpriteY + 250, 35, 35);
 
-        // Left direction
-        frames_[0][1].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 200, 35, 35));     // Left frame 1
-        frames_[0][1].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 200, 35, 35));     // Left frame 1
-        frames_[0][1].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 250, 35, 35));     // Left frame 2
-        frames_[0][1].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 250, 35, 35));     // Left frame 2
+        normalDownFrames.emplace_back(normalSpriteX, normalSpriteY + 100, 35, 35);
+        normalDownFrames.emplace_back(normalSpriteX, normalSpriteY + 150, 35, 35);
 
-        // Down direction
-        frames_[0][2].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 100, 35, 35));     // Down frame 1
-        frames_[0][2].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 100, 35, 35));     // Down frame 1
-        frames_[0][2].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 150, 35, 35));     // Down frame 2
-        frames_[0][2].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 150, 35, 35));     // Down frame 2
+        normalRightFrames.emplace_back(normalSpriteX, normalSpriteY, 35, 35);
+        normalRightFrames.emplace_back(normalSpriteX, normalSpriteY + 50, 35, 35);
 
-        // Right direction
-        frames_[0][3].push_back(sf::IntRect(normalSpriteX, normalSpriteY, 35, 35));           // Right frame 1
-        frames_[0][3].push_back(sf::IntRect(normalSpriteX, normalSpriteY, 35, 35));           // Right frame 1
-        frames_[0][3].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 50, 35, 35));      // Right frame 2
-        frames_[0][3].push_back(sf::IntRect(normalSpriteX, normalSpriteY + 50, 35, 35));      // Right frame 2
+        // FEAR mode frames (solid blue) - 2 frames
+        fearFrames.emplace_back(2, 554, 35, 35);
+        fearFrames.emplace_back(2, 604, 35, 35);
 
-        // FEAR mode frames - SOLID BLUE (mode 1)
-        // Up - blue
-        frames_[1][0].push_back(sf::IntRect(2, 554, 35, 35));      // Blue up frame 1
-        frames_[1][0].push_back(sf::IntRect(2, 554, 35, 35));      // Blue up frame 1
-        frames_[1][0].push_back(sf::IntRect(2, 604, 35, 35));      // Blue up frame 2
-        frames_[1][0].push_back(sf::IntRect(2, 604, 35, 35));      // Blue up frame 2
+        // FEAR FLASHING mode frames (blue/white alternating) - 4 frames
+        fearFlashingFrames.emplace_back(2, 554, 35, 35);   // Blue 1
+        fearFlashingFrames.emplace_back(2, 604, 35, 35);   // Blue 2
+        fearFlashingFrames.emplace_back(52, 554, 35, 35);  // White 1
+        fearFlashingFrames.emplace_back(52, 604, 35, 35);  // White 2
 
-        // Left - blue
-        frames_[1][1].push_back(sf::IntRect(2, 554, 35, 35));      // Blue left frame 1
-        frames_[1][1].push_back(sf::IntRect(2, 554, 35, 35));      // Blue left frame 1
-        frames_[1][1].push_back(sf::IntRect(2, 604, 35, 35));      // Blue left frame 2
-        frames_[1][1].push_back(sf::IntRect(2, 604, 35, 35));      // Blue left frame 2
-
-        // Down - blue
-        frames_[1][2].push_back(sf::IntRect(2, 554, 35, 35));      // Blue down frame 1
-        frames_[1][2].push_back(sf::IntRect(2, 554, 35, 35));      // Blue down frame 1
-        frames_[1][2].push_back(sf::IntRect(2, 604, 35, 35));      // Blue down frame 2
-        frames_[1][2].push_back(sf::IntRect(2, 604, 35, 35));      // Blue down frame 2
-
-        // Right - blue
-        frames_[1][3].push_back(sf::IntRect(52, 554, 35, 35));     // Blue right frame 1
-        frames_[1][3].push_back(sf::IntRect(52, 554, 35, 35));     // Blue right frame 1
-        frames_[1][3].push_back(sf::IntRect(52, 604, 35, 35));     // Blue right frame 2
-        frames_[1][3].push_back(sf::IntRect(52, 604, 35, 35));     // Blue right frame 2
-
-        // FEAR FLASHING mode frames - BLUE/WHITE ALTERNATING (mode 2)
-        // Up - blue then white
-        frames_[2][0].push_back(sf::IntRect(2, 554, 35, 35));
-        frames_[2][0].push_back(sf::IntRect(2, 604, 35, 35));
-        frames_[2][0].push_back(sf::IntRect(52, 554, 35, 35));
-        frames_[2][0].push_back(sf::IntRect(52, 604, 35, 35));
-
-        // Left - blue then white
-        frames_[2][1].push_back(sf::IntRect(2, 554, 35, 35));      // Blue left
-        frames_[2][1].push_back(sf::IntRect(2, 604, 35, 35));      // Blue left
-        frames_[2][1].push_back(sf::IntRect(52, 554, 35, 35));     // White left
-        frames_[2][1].push_back(sf::IntRect(52, 604, 35, 35));     // White left
-
-        // Down - blue then white
-        frames_[2][2].push_back(sf::IntRect(2, 554, 35, 35));      // Blue down
-        frames_[2][2].push_back(sf::IntRect(2, 604, 35, 35));      // Blue down
-        frames_[2][2].push_back(sf::IntRect(52, 554, 35, 35));    // White down
-        frames_[2][2].push_back(sf::IntRect(52, 604, 35, 35));    // White down
-
-        // Right - blue then white
-        frames_[2][3].push_back(sf::IntRect(52, 554, 35, 35));     // Blue right
-        frames_[2][3].push_back(sf::IntRect(52, 604, 35, 35));     // Blue right
-        frames_[2][3].push_back(sf::IntRect(52, 554, 35, 35));    // White right
-        frames_[2][3].push_back(sf::IntRect(52, 604, 35, 35));    // White right
-
-        // EATEN mode frames (just eyes) - mode 3
+        // EATEN mode frames (just eyes) - 1 frame each
         int eyesX = 302;
-        frames_[3][0].push_back(sf::IntRect(eyesX, 404, 35, 35));      // Eyes up
-        frames_[3][1].push_back(sf::IntRect(eyesX, 354, 35, 35));      // Eyes left
-        frames_[3][2].push_back(sf::IntRect(eyesX, 304, 35, 35));      // Eyes down
-        frames_[3][3].push_back(sf::IntRect(eyesX, 254, 35, 35));      // Eyes right
+        eatenUpFrames.emplace_back(eyesX, 404, 35, 35);
+        eatenLeftFrames.emplace_back(eyesX, 354, 35, 35);
+        eatenDownFrames.emplace_back(eyesX, 304, 35, 35);
+        eatenRightFrames.emplace_back(eyesX, 254, 35, 35);
+    }
+
+    const std::vector<sf::IntRect>& GhostView::getCurrentFrames() const {
+        switch (currentMode_) {
+            case 0: // Normal mode
+                switch (currentDirection_) {
+                    case logic::Direction::Up: return normalUpFrames;
+                    case logic::Direction::Left: return normalLeftFrames;
+                    case logic::Direction::Down: return normalDownFrames;
+                    case logic::Direction::Right: return normalRightFrames;
+                    default: return normalLeftFrames;
+                }
+
+            case 1: // Fear mode
+                return fearFrames;
+
+            case 2: // Fear flashing mode
+                return fearFlashingFrames;
+
+            case 3: // Eaten mode
+                switch (currentDirection_) {
+                    case logic::Direction::Up: return eatenUpFrames;
+                    case logic::Direction::Left: return eatenLeftFrames;
+                    case logic::Direction::Down: return eatenDownFrames;
+                    case logic::Direction::Right: return eatenRightFrames;
+                    default: return eatenLeftFrames;
+                }
+
+            default:
+                return normalLeftFrames;
+        }
     }
 
     void GhostView::updateAnimation() {
-        static int frameCounter = 0;
-        frameCounter++;
+        frameCounter_++;
 
-        if (frameCounter % 3 == 0) {
-            // Get direction index
-            int dirIndex = 1; // Default: Left
-            switch (currentDirection_) {
-                case logic::Direction::Up: dirIndex = 0; break;
-                case logic::Direction::Left: dirIndex = 1; break;
-                case logic::Direction::Down: dirIndex = 2; break;
-                case logic::Direction::Right: dirIndex = 3; break;
-                default: dirIndex = 1; break;
-            }
+        int framesBetweenUpdates = 5;
 
-            // Get frames for current mode and direction
-            auto& currentFrames = frames_[currentMode_][dirIndex];
+        if (frameCounter_ % framesBetweenUpdates == 0) {
+            const std::vector<sf::IntRect>& currentFrames = getCurrentFrames();
 
             if (!currentFrames.empty()) {
                 currentFrame_ = (currentFrame_ + 1) % currentFrames.size();
-
                 sprite_.setTextureRect(currentFrames[currentFrame_]);
             }
         }
 
-        // Reset counter periodically
-        if (frameCounter > 1000) frameCounter = 0;
+        if (frameCounter_ > 10000) frameCounter_ = 0;
     }
 
     void GhostView::onGameEvent(logic::GameEvent event, int data) {
         switch (event) {
             case logic::GameEvent::GhostModeChanged:
-                // 0 = normal mode
-                // 1 = fear mode (solid blue)
-                // 2 = fear flashing mode (blue/white alternating)
-                // 3 = eaten mode
                 if (data >= 0 && data <= 3) {
                     currentMode_ = data;
-                    currentFrame_ = 0; // Reset animation frame
+                    currentFrame_ = 0;
 
-                    // Update immediately to new mode
-                    int dirIndex = 1; // Default: Left
-                    switch (currentDirection_) {
-                        case logic::Direction::Up: dirIndex = 0; break;
-                        case logic::Direction::Left: dirIndex = 1; break;
-                        case logic::Direction::Down: dirIndex = 2; break;
-                        case logic::Direction::Right: dirIndex = 3; break;
-                    }
-
-                    auto& frames = frames_[currentMode_][dirIndex];
+                    const std::vector<sf::IntRect>& frames = getCurrentFrames();
                     if (!frames.empty()) {
                         sprite_.setTextureRect(frames[0]);
                     }
@@ -162,18 +109,9 @@ namespace view
                     logic::Direction newDir = static_cast<logic::Direction>(data);
                     if (currentDirection_ != newDir) {
                         currentDirection_ = newDir;
-                        currentFrame_ = 0; // Reset animation frame
+                        currentFrame_ = 0;
 
-                        // Update immediately to new direction
-                        int dirIndex = 1; // Default: Left
-                        switch (currentDirection_) {
-                            case logic::Direction::Up: dirIndex = 0; break;
-                            case logic::Direction::Left: dirIndex = 1; break;
-                            case logic::Direction::Down: dirIndex = 2; break;
-                            case logic::Direction::Right: dirIndex = 3; break;
-                        }
-
-                        auto& frames = frames_[currentMode_][dirIndex];
+                        const std::vector<sf::IntRect>& frames = getCurrentFrames();
                         if (!frames.empty()) {
                             sprite_.setTextureRect(frames[0]);
                         }
@@ -183,7 +121,6 @@ namespace view
         }
     }
 
-    // Concrete ghost classes
     BlinkyView::BlinkyView(std::weak_ptr<logic::BlinkyEntity> model)
         : GhostView(model, 0, 4) {}
 

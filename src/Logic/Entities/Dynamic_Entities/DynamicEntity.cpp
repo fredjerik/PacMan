@@ -7,14 +7,15 @@
 
 namespace logic {
 
-    DynamicEntity::DynamicEntity(Position startPos, Size size, float velX_unit, float velY_unit, float speed)
-        : Entity(startPos, size),  currentDirection(Direction::None),
-          velX(0.0f), velY(0.0f), m_velX_unit(velX_unit), m_velY_unit(velY_unit), speed_(speed){}
+    DynamicEntity::DynamicEntity(Position startPos, Size size, Size tile_size, float speed)
+        : Entity(startPos, size, tile_size), currentDirection(Direction::None), nextDirection(Direction::None),
+          speed_(speed), velX(0.0f), velY(0.0f), m_velX_unit(tile_size.width), m_velY_unit(tile_size.height)
+    {
+    }
 
     void DynamicEntity::setDirection(Direction dir) {
         if (currentDirection != dir)
         {
-            // Send event with direction as data
             OnEvent(GameEvent::DirectionChanged, static_cast<int>(dir));
         }
         currentDirection = dir;
@@ -68,7 +69,6 @@ namespace logic {
     void DynamicEntity::update(float deltaTime) {
         pos_.x += velX * speed_ * deltaTime;
         pos_.y += velY * speed_ * deltaTime;
-        // std::cout << to_string(currentDirection) << std::endl;
         notify();
     }
 
@@ -97,13 +97,32 @@ namespace logic {
         return proposed;
     }
 
+    Direction DynamicEntity::getReverseDirection(Direction currentDir)
+    {
+        switch (currentDir)
+        {
+        case Direction::Left: return Direction::Right;
+        case Direction::Right: return Direction::Left;
+        case Direction::Up: return Direction::Down;
+        case Direction::Down: return Direction::Up;
+        default: return Direction::None;
+        }
+    }
+
+    bool DynamicEntity::isReverseDirection(Direction dir1, Direction dir2) {
+        return (dir1 == Direction::Left && dir2 == Direction::Right) ||
+               (dir1 == Direction::Right && dir2 == Direction::Left) ||
+               (dir1 == Direction::Up && dir2 == Direction::Down) ||
+               (dir1 == Direction::Down && dir2 == Direction::Up);
+    }
+
     void DynamicEntity::snapToGrid(float tileWidth, float tileHeight) {
         float xInGrid = (pos_.x + 1.0f) / tileWidth;
-        int tileX = static_cast<int>(round(xInGrid));
+        float tileX = std::round(xInGrid);
         pos_.x = tileX * tileWidth - 1.0f;
 
         float yInGrid = (pos_.y + 1.0f) / tileHeight;
-        int tileY = static_cast<int>(round(yInGrid));
+        float tileY = std::round(yInGrid);
         pos_.y = tileY * tileHeight - 1.0f;
 
         notify();
